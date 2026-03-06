@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+
+backend:
+build: ./backend
+container_name: cartier_backend
+ports:
+- "8000:8000"
+volumes:
+- ./backend:/app
+depends_on:
+- mongodb
+environment:
+- MONGO_URI=mongodb://mongodb:27017/cartier
+command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+frontend:
+build: ./frontend
+container_name: cartier_frontend
+ports:
+- "3000:3000"
+volumes:
+- ./frontend:/app
+- /app/node_modules
+depends_on:
+- backend
+command: npm start
+
+mongodb:
+image: mongo:7
+container_name: cartier_db
+restart: always
+ports:
+- "27017:27017"
+volumes:
+- mongodb_data:/data/db
+
+volumes:
+mongodb_data:
